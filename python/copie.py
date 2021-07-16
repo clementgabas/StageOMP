@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from astropy.io import fits
 import pandas as pd
+import scipy.stats as scs
+import statsmodels.api as sm
 
 from python.plotfunctions import *
 
@@ -86,11 +88,23 @@ for lentille in lentilles_list:
 seeing_list_lentille = np.array([lentille.seeing for lentille in lentilles_list])
 seeing_list_obj = np.array([obj.seeing for obj in list_of_objects])
 
+seeing_list_lentille_noNA = seeing_list_lentille[~np.isnan(seeing_list_lentille)]
+seeing_list_obj_noNA = seeing_list_obj[~np.isnan(seeing_list_obj)]
+
+def centrer_reduit(array):
+    return (array-np.mean(array))/np.std(array)
+
+
+seeing_list_lentille_r = centrer_reduit(seeing_list_lentille_noNA)
+seeing_list_obj_r = centrer_reduit(seeing_list_obj_noNA)
+
+
 bins = np.linspace(0, 1, 30)
 
-plt.hist(seeing_list_lentille, bins, alpha=0.5, density = True, label=f"Répartition empirique des lentilles (n = {len(seeing_list_lentille)})")
-plt.hist(seeing_list_obj, bins, alpha=0.5, density = True,
-         label=f"Répartition théorique des champs (n = {len(seeing_list_obj)})")
+plt.hist(seeing_list_lentille_noNA, bins, alpha=0.5, density=True,
+         label=f"Répartition empirique des lentilles (n = {len(seeing_list_lentille_noNA)})")
+plt.hist(seeing_list_obj_noNA, bins, alpha=0.5, density=True,
+         label=f"Répartition théorique des champs (n = {len(seeing_list_obj_noNA)})")
 plt.legend(loc = 'upper right')
 plt.title(
     "Densité de répartition des lentilles en fonction du seeing sur les champs W1-4")
@@ -99,10 +113,10 @@ plt.ylabel("Densité")
 plt.show()
 
 bw_dict = {'bw': 0.3}
-sns.distplot(seeing_list_lentille, kde=True, bins=bins, rug=True, kde_kws=bw_dict,
-            label=f"empirique (n = {len(seeing_list_lentille)})")
-sns.distplot(seeing_list_obj, kde=True, bins=bins, rug=True, kde_kws=bw_dict,
-            label=f"théorique (n = {len(seeing_list_obj)})")
+sns.distplot(seeing_list_lentille_noNA, kde=True, bins=bins, rug=True, kde_kws=bw_dict,
+            label=f"empirique (n = {len(seeing_list_lentille_noNA)})")
+sns.distplot(seeing_list_obj_noNA, kde=True, bins=bins, rug=True, kde_kws=bw_dict,
+            label=f"théorique (n = {len(seeing_list_obj_noNA)})")
 plt.legend(loc='upper right')
 plt.title("Densité de répartition des lentilles en fonction du seeing sur les champs W1-4")
 plt.suptitle(
@@ -112,19 +126,24 @@ plt.ylabel("Densité")
 plt.show()
 
 # -- Normalité des échantillons
-import statsmodels.api as sm
 
 fig, (axe0, axe1) = plt.subplots(1, 2)
 make_global_title(
     fig,
     title="QQ-plot des répartition empiriques et thoériques des lentilles selon le seeing")
-sm.qqplot(seeing_list_lentille, line='45', ax = axe0)
-sm.qqplot(seeing_list_obj, line='45', ax = axe1)
-axe0.title.set_text(f"Lentilles (n = {len(seeing_list_lentille)})")
-axe1.title.set_text(f"Champs (n = {len(seeing_list_obj)})")
+sm.qqplot(seeing_list_lentille_r, line='45', ax=axe0, )
+sm.qqplot(seeing_list_obj_r, line='45', ax=axe1)
+axe0.title.set_text(f"Lentilles (n = {len(seeing_list_lentille_r)})")
+axe1.title.set_text(f"Champs (n = {len(seeing_list_obj_r)})")
 
 plt.show()
 
+# T test de Welch
+_, p_value = scs.ttest_ind(seeing_list_lentille_r, seeing_list_obj_r, equal_var=False)
+p_value #on accepte H_0
+
+
+"""
 # -- Wilcoxon signed rank test
 # Nécessite 2 échantillons de même taille
 import random
@@ -135,6 +154,8 @@ len(seeing_list_lentille) == len(seeing_list_obj_bis)
 # Test
 import scipy.stats as scs
 scs.wilcoxon(x = seeing_list_lentille, y = seeing_list_obj_bis, alternative = "two-sided")
+"""
+
 #--- Copie des plots
 '''
 fig, axes = plt.subplots(2, 2)
