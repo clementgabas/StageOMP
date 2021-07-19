@@ -62,7 +62,7 @@ plt.show()
 fig, (axe0, axe1) = plt.subplots(1, 2)
 make_global_title(
     fig,
-    title="QQ-plot des répartition empiriques et thoériques des lentilles selon le seeing")
+    title="QQ-plot des répartition empiriques et théoriques des lentilles selon le seeing")
 sm.qqplot(seeing_list_lentille_01, line='45', ax=axe0, )
 sm.qqplot(seeing_list_obj_01, line='45', ax=axe1)
 axe0.title.set_text(f"Lentilles (n = {len(seeing_list_lentille_01)})")
@@ -94,3 +94,55 @@ _, p_value = scs.ttest_ind(seeing_list_lentille_01,
                            seeing_list_obj_01, equal_var=False)
 p_value 
 # on accepte H_0
+
+
+# ---- Exposition
+
+expo_list_lentille = np.array([lentille.exposition for lentille in lentilles_list])
+expo_list_obj = np.array([obj.exposition for obj in obj_list])
+
+expo_list_lentille_noNA = expo_list_lentille[~np.isnan(
+    expo_list_lentille)]
+expo_list_obj_noNA = expo_list_obj[~np.isnan(expo_list_obj)]
+
+expo_list_lentille_01 = centrer_reduit(expo_list_lentille_noNA)
+expo_list_obj_01 = centrer_reduit(expo_list_obj_noNA)
+
+# --- 1er histogrammes d'exposition
+bins = np.linspace(40, 160, 8)
+
+plt.hist(expo_list_lentille_noNA, bins, alpha=0.5, density=True,
+         label=f"Répartition empirique des lentilles (n = {len(expo_list_lentille_noNA)})")
+plt.hist(expo_list_obj_noNA, bins, alpha=0.5, density=True,
+         label=f"Répartition théorique des champs (n = {len(expo_list_obj_noNA)})")
+plt.legend(loc='upper right')
+plt.title(
+    "Densité de répartition des lentilles en fonction de l'exposition sur les champs W1-4")
+plt.xlabel("Exposition")
+plt.ylabel("Densité")
+plt.gca().invert_xaxis()
+plt.show()
+
+# --- étude de la normalité des 2 échantillons
+
+#qqplots
+fig, (axe0, axe1) = plt.subplots(1, 2)
+make_global_title(
+    fig,
+    title="QQ-plot des répartition empiriques et théoriques des lentilles selon l'exposition")
+sm.qqplot(expo_list_lentille_01, line='45', ax=axe0, )
+sm.qqplot(expo_list_obj_01, line='45', ax=axe1)
+axe0.title.set_text(f"Lentilles (n = {len(expo_list_lentille_01)})")
+axe1.title.set_text(f"Champs (n = {len(expo_list_obj_01)})")
+
+plt.show()
+
+# -- Wilcoxon non paramétrique
+N = 10_000
+p_values = np.zeros(N)
+for i in range(N):
+    np.random.shuffle(expo_list_obj_noNA)
+    expo_list_obj_noNA_len = expo_list_obj_noNA[0:len(expo_list_lentille_noNA)]
+
+    _, p_values[i] = scs.wilcoxon(x=expo_list_lentille_noNA, y=expo_list_obj_noNA_len)
+np.mean(p_values)
