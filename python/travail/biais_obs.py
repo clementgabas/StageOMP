@@ -34,10 +34,10 @@ plt.hist(seeing_list_lentille_noNA, bins, alpha=0.5, density=True,
          label=f"Répartition empirique des lentilles (n = {len(seeing_list_lentille_noNA)})")
 plt.hist(seeing_list_obj_noNA, bins, alpha=0.5, density=True,
          label=f"Répartition théorique des champs (n = {len(seeing_list_obj_noNA)})")
-plt.legend(loc='upper right')
+plt.legend(loc='upper left')
 plt.title(
     "Densité de répartition des lentilles en fonction du seeing sur les champs W1-4")
-plt.xlabel("Seeing")
+plt.xlabel("Seeing (arc sec)")
 plt.ylabel("Densité")
 plt.show()
 
@@ -79,13 +79,14 @@ plt.hist(seeing_list_lentille_noNA, bins, alpha=0.5, density=True,
 plt.hist(seeing_list_obj_noNA, bins, alpha=0.5, density=True,
          label=f"Répartition théorique des champs (n = {len(seeing_list_obj_noNA)})", color = 'orange')
 x = np.linspace(0, 1, 100)
-plt.plot(x, norm.pdf(x, mu_l, std_l), 'blue', linewidth=2, label = f"Densité gausienne lentilles, mu = {round(mu_l,2)}, std = {round(std_l,3)}")
-plt.plot(x, norm.pdf(x, mu_w, std_w), 'orange', linewidth=2, label = f"Densité gausienne fields, mu = {round(mu_w,2)}, std = {round(std_w,3)}")
+plt.plot(x, norm.pdf(x, mu_l, std_l), 'blue', linewidth=2, label = f"Densité gausienne lentilles, $\mu$ = {round(mu_l,2)}, $\sigma$ = {round(std_l,3)}")
+plt.plot(x, norm.pdf(x, mu_w, std_w), 'orange', linewidth=2,
+         label=f"Densité gausienne fields, $\mu$ = {round(mu_w,2)}, $\sigma$ = {round(std_w,3)}")
 
 plt.legend(loc='upper left')
 plt.title(
     "Densité de répartition des lentilles en fonction du seeing sur les champs W1-4")
-plt.xlabel("Seeing")
+plt.xlabel("Seeing (arc sec)")
 plt.ylabel("Densité")
 plt.show()
 
@@ -118,7 +119,7 @@ plt.hist(expo_list_obj_noNA, bins, alpha=0.5, density=True,
 plt.legend(loc='upper right')
 plt.title(
     "Densité de répartition des lentilles en fonction de l'exposition sur les champs W1-4")
-plt.xlabel("Exposition")
+plt.xlabel("Exposition (min)")
 plt.ylabel("Densité")
 plt.gca().invert_xaxis()
 plt.show()
