@@ -5,6 +5,8 @@ class LentilleGravita():
         self.dec = dec_deg
         self.seeing = float()
         self.exposition = float()
+        self.w = str()
+        self.ppv = None
         
     def compute_seeing(self, list_of_w_objects):
         obj = self.closest_object(list_of_w_objects)
@@ -13,6 +15,10 @@ class LentilleGravita():
     def compute_exposition(self, list_of_w_objects):
         obj = self.closest_object(list_of_w_objects)
         return obj.exposition
+    
+    def compute_cadran(self, list_of_w_objects):
+        obj = self.closest_object(list_of_w_objects)
+        return obj.w
     
     def distance(self, other):
         out = ((self.ra - other.ra)**2 + (self.dec - other.dec)**2)**(1/2)
@@ -38,6 +44,9 @@ class LentilleGravita():
     def set_exposition(self, value: float):
         self.exposition = value
         
+    def set_cadran(self, value: str):
+        self.w = value
+        
     def __str__(self):
         os = str()
         os += "Lentille: \n"
@@ -46,3 +55,7 @@ class LentilleGravita():
         os += f"Exposition: {self.exposition} (min)" + "\n"
         os += f"Seeing: {self.seeing} (arc sec)" + "\n"
         return os
+    
+    def set_ppv(self, other):
+        self.ppv = other
+        

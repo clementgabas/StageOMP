@@ -147,3 +147,18 @@ for i in range(N):
 
     _, p_values[i] = scs.wilcoxon(x=expo_list_lentille_noNA, y=expo_list_obj_noNA_len)
 np.mean(p_values)
+
+# ---------------------------
+"""lentilles_list_1 = [lentille for lentille in lentilles_list if lentille.w == 1]
+
+for i in range(len(lentilles_list_1)):
+    curr_lent = lentilles_list_1[i]
+    curr_lent_ppv = curr_lent.closest_object(
+        lentilles_list_1[0:i]+lentilles_list_1[i+1:])
+    curr_lent.set_ppv(curr_lent_ppv)
+"""
+dit_list = [lentille.distance(lentille.ppv) for lentille in lentilles_list]
+bins = np.linspace(0, 4, 40)
+
+plt.hist(dit_list, bins, density = True)
+plt.show()
