@@ -147,10 +147,28 @@ for i in range(N):
     np.random.shuffle(expo_list_obj_noNA)
     expo_list_obj_noNA_len = expo_list_obj_noNA[0:len(expo_list_lentille_noNA)]
 
-    _, p_values[i] = scs.wilcoxon(x=expo_list_lentille_noNA, y=expo_list_obj_noNA_len)
+    _, p_values[i] = scs.wilcoxon(x=expo_list_lentille_noNA, y=expo_list_obj_noNA_len, alternative="two-sided")
 np.mean(p_values)
 
 # -- Etude selon le rayon d'Einstein
+bins = np.linspace(0, 20, 50)
+z_ech_w1 = [
+    lentille.rad for lentille in lentilles_list if lentille.w in ("W1", "D1")]
+z_ech_w2 = [lentille.rad for lentille in lentilles_list if lentille.w == "W2"]
+z_ech_w3 = [
+    lentille.rad for lentille in lentilles_list if lentille.w in ("W3", "D3")]
+z_ech_w4 = [lentille.rad for lentille in lentilles_list if lentille.w == "W4"]
+
+fig, axes = plt.subplots(2, 2)
+hist_sub_data(axes, [0, 0], z_ech_w1, "W1", _bins=bins)
+hist_sub_data(axes, [0, 1], z_ech_w2, "W2", _bins=bins)
+hist_sub_data(axes, [1, 0], z_ech_w3, "W3", _bins=bins)
+hist_sub_data(axes, [1, 1], z_ech_w4, "W4", _bins=bins)
+
+make_global_title(fig, "Histogramme des rayon d'Einstein des lentilles")
+plt.show()
+
+# -- Etude selon le redshift
 bins = np.linspace(0, 2, 20)
 z_ech_w1 = [lentille.z for lentille in lentilles_list if lentille.w in ("W1", "D1")]
 z_ech_w2 = [lentille.z for lentille in lentilles_list if lentille.w == "W2"]
@@ -167,6 +185,41 @@ make_global_title(fig, "Histogramme des redshift des lentilles")
 plt.show()
 
 
+ra, dec, z, rac = [lentille.ra for lentille in lentilles_list], [lentille.dec for lentille in lentilles_list], [lentille.z for lentille in lentilles_list], [lentille.rad for lentille in lentilles_list]
+
+
+fig, axes = plt.subplots(2, 2)
+
+# rayon einstein
+plot_sub_data(axes, [0, 0], ra, dec, (30, 40), (-14, -2), "W1", color=rac, _marker = 'o')
+plot_sub_data(axes, [0, 1], ra, dec, (131, 138), (-6, 0), "W2", color=rac, _marker = 'o')
+plot_sub_data(axes, [1, 0], ra, dec, (205, 225), (50, 60), "W3", color=rac, _marker = 'o')
+sc4 = axes[1, 1].scatter(ra, dec, marker='o', c=rac)
+plt.colorbar(sc4)
+axes[1, 1].set_xlim((328, 338))
+axes[1, 1].set_ylim((-2, 5))
+axes[1, 1].set_title("W4")
+
+# redshift
+plot_sub_data(axes, [0, 0], ra, dec, (30, 40), (-14, -2), "W1", color = z)
+plot_sub_data(axes, [0, 1], ra, dec, (131, 138), (-6, 0), "W2", color=z)
+sc3 = axes[1, 0].scatter(ra, dec, marker='+', c=z)
+axes[1, 0].set_xlim((205, 225))
+axes[1, 0].set_ylim((50, 60))
+axes[1, 0].set_title("W3")
+plt.colorbar(sc3)
+plot_sub_data(axes, [1, 1], ra, dec, (328, 338), (-2, 5), "W4", color=z)
+
+
+make_global_title(fig, "Disposition des lentilles et redshift et rayon d'einstein")
+
+# plt.scatter(x=[lentille.ra for lentille in lentilles_list], y=[lentille.dec for lentille in lentilles_list], marker='+', c=[lentille.z for lentille in lentilles_list])
+# plt.show()
+
+# fig, axes = plt.subplots(2, 2)
+
+
+plt.show()
 
 
 
@@ -181,8 +234,21 @@ for i in range(len(lentilles_list_1)):
         lentilles_list_1[0:i]+lentilles_list_1[i+1:])
     curr_lent.set_ppv(curr_lent_ppv)
 """
+
+"""
 dit_list = [lentille.distance(lentille.ppv) for lentille in lentilles_list]
 bins = np.linspace(0, 4, 40)
 
 plt.hist(dit_list, bins, density = True)
 plt.show()
+"""
+
+
+"""
+C = [[o.ra, o.dec,] for o in obj_list]
+X = [o.ra for o in obj_list]
+Y = [o.dec for o in obj_list]
+Z = np.array([o.seeing for o in obj_list])
+plt.pcolormesh(X=X, Y=Y, cmap=Z, shading='nearest', vmin=Z.min(), vmax=Z.max())
+plt.show()
+"""

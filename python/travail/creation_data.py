@@ -99,6 +99,12 @@ for lentille in lentilles_list2:
     lentille.set_seeing(seeing_value)
     exposition_value = lentille.compute_exposition(list_of_objects)
     lentille.set_exposition(exposition_value)
+    
+for i in range(len(lentilles_list2)):
+    curr_lent = lentilles_list2[i]
+    curr_lent_ppv = curr_lent.closest_object(
+        lentilles_list2[0:i]+lentilles_list2[i+1:])
+    curr_lent.set_ppv(curr_lent_ppv)
 
 # --- enregistrement des données lentilles
 pickle.dump(lentilles_list2, open("./source_pickle/lentilles_list2", "wb"))
