@@ -69,3 +69,36 @@ for i in range(len(lentilles_list)):
 
 # --- enregistrement des données lentilles
 pickle.dump(lentilles_list, open("./source_pickle/lentilles_list", "wb"))
+
+
+
+# --- Chargement des données lentilles 2
+file_lentilles2 = "./source/Lentilles.csv"
+data_lentilles2 = pd.read_csv(file_lentilles2, header=0, sep=";", skiprows=[1])
+data_lentilles2 = data_lentilles2[['_RAJ2000', '_DEJ2000', 'RA', 'Rad', 'zph', 'Fld']]
+data_lentilles2["RA"] = pd.to_numeric(data_lentilles2["RA"])
+data_lentilles2["Rad"] = pd.to_numeric(data_lentilles2["Rad"])
+
+
+
+lentilles_list2 = list()
+for i in range(len(data_lentilles2)):
+    lentilles_list2.append(
+        LentilleGravita(
+            ra_deg=data_lentilles2["_RAJ2000"].iloc[i],
+            dec_deg=data_lentilles2["_DEJ2000"].iloc[i],
+            field=data_lentilles2["Fld"].iloc[i],
+            z_redshift=data_lentilles2["zph"].iloc[i],
+            arc_radius=data_lentilles2["Rad"].iloc[i]
+        )
+    )
+    
+#-- Valeurs de seeing et d'exposition des lentilles
+for lentille in lentilles_list2:
+    seeing_value = lentille.compute_seeing(list_of_objects)
+    lentille.set_seeing(seeing_value)
+    exposition_value = lentille.compute_exposition(list_of_objects)
+    lentille.set_exposition(exposition_value)
+
+# --- enregistrement des données lentilles
+pickle.dump(lentilles_list2, open("./source_pickle/lentilles_list2", "wb"))

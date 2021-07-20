@@ -1,11 +1,16 @@
 class LentilleGravita():
     
-    def __init__(self, ra_deg: float, dec_deg: float):
+    def __init__(self, ra_deg: float, dec_deg: float, field: str = str(), z_redshift: float = float(), arc_radius: float() = float()):
         self.ra = ra_deg
         self.dec = dec_deg
+        self.w = field
+        self.z_redshift = z_redshift
+        self.z = self.z_redshift # alias
+        self.arc_radius = arc_radius
+        self.rad = self.arc_radius # alias
+        
         self.seeing = float()
         self.exposition = float()
-        self.w = str()
         self.ppv = None
         
     def compute_seeing(self, list_of_w_objects):
@@ -49,9 +54,10 @@ class LentilleGravita():
         
     def __str__(self):
         os = str()
-        os += "Lentille: \n"
-        os += f"RA: {self.ra} (deg)" + "\n"
-        os += f"DEC: {self.dec} (deg)" + "\n"
+        os += f"Lentille: ({self.w}) \n"
+        os += f"Right Assent: {self.ra} (deg)" + "\n"
+        os += f"Decli: {self.dec} (deg)" + "\n"
+        os += f"RedShift: {self.z}" + "\n"
         os += f"Exposition: {self.exposition} (min)" + "\n"
         os += f"Seeing: {self.seeing} (arc sec)" + "\n"
         return os

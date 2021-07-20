@@ -7,10 +7,12 @@ from python.plotfunctions import *
 from scipy.stats import norm
 import scipy.stats as scs
 
+#--- load classes
+from python.objets.wobjet import WDegCarre
+from python.objets.lentille import LentilleGravita
 
 
-
-lentilles_list = pickle.load(open("./source_pickle/lentilles_list", "rb"))
+lentilles_list = pickle.load(open("./source_pickle/lentilles_list2", "rb"))
 obj_list = pickle.load(open("./source_pickle/fields", "rb"))
 
 # -- listes de données seeing
@@ -147,6 +149,28 @@ for i in range(N):
 
     _, p_values[i] = scs.wilcoxon(x=expo_list_lentille_noNA, y=expo_list_obj_noNA_len)
 np.mean(p_values)
+
+# -- Etude selon le rayon d'Einstein
+bins = np.linspace(0, 2, 20)
+z_ech_w1 = [lentille.z for lentille in lentilles_list if lentille.w in ("W1", "D1")]
+z_ech_w2 = [lentille.z for lentille in lentilles_list if lentille.w == "W2"]
+z_ech_w3 = [lentille.z for lentille in lentilles_list if lentille.w in ("W3", "D3")]
+z_ech_w4 = [lentille.z for lentille in lentilles_list if lentille.w == "W4"]
+
+fig, axes = plt.subplots(2, 2)
+hist_sub_data(axes, [0, 0], z_ech_w1, "W1", _bins = bins)
+hist_sub_data(axes, [0, 1], z_ech_w2, "W2", _bins=bins)
+hist_sub_data(axes, [1, 0], z_ech_w3, "W3", _bins=bins)
+hist_sub_data(axes, [1, 1], z_ech_w4, "W4", _bins=bins)
+
+make_global_title(fig, "Histogramme des redshift des lentilles")
+plt.show()
+
+
+
+
+
+
 
 # ---------------------------
 """lentilles_list_1 = [lentille for lentille in lentilles_list if lentille.w == 1]
