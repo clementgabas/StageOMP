@@ -35,6 +35,7 @@ results2 = model2.fit()
 print(results2.summary())
 
 c = data_lentilles2.corr()
+c = df.corr()
 sns.heatmap(c, annot=True)
 plt.show()
 

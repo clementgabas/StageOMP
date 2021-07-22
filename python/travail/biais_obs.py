@@ -194,9 +194,9 @@ plot_sub_data(axes, [1, 0], raL_m, decL_m, (205, 225), (50, 60), "W3")
 plot_sub_data(axes, [1, 0], raL_p, decL_p, (205, 225),
               (50, 60), "W3", _marker='o', color='blue')
 
-plot_sub_data(axes, [1, 1], raL_m, decL_m, (328, 338), (-2, 5), "W4", _label = "<0.5")
+plot_sub_data(axes, [1, 1], raL_m, decL_m, (328, 338), (-2, 5), "W4", _label = "redshift<0.5")
 plot_sub_data(axes, [1, 1], raL_p, decL_p, (328, 338),
-              (-2, 5), "W4", _marker='o', color='blue', _label = '>0.5')
+              (-2, 5), "W4", _marker='o', color='blue', _label = 'redshift$\geq$0.5')
 fig.legend()
 
 make_global_title(
@@ -260,7 +260,7 @@ ax3.hist(expo_p, alpha=0.5, density=True, label=f"z$\geq$0.5 (n={len(expo_p)})")
 ax3.set_xlabel("Exposition (min)")
 ax3.set_yabel("Densité")
 ax3.legend()
-plt.suptitle("Histogrammes de densité de seeing des lentilles en fonction du redshift")
+plt.suptitle("Histogrammes de densité d'exposition des lentilles en fonction du redshift")
 
 plt.show()
 
@@ -290,9 +290,9 @@ plot_sub_data(axes, [1, 0], raL_m, decL_m, (205, 225), (50, 60), "W3")
 plot_sub_data(axes, [1, 0], raL_p, decL_p, (205, 225),
               (50, 60), "W3", _marker='o', color='blue')
 
-plot_sub_data(axes, [1, 1], raL_m, decL_m, (328, 338), (-2, 5), "W4", _label = "<0.5")
+plot_sub_data(axes, [1, 1], raL_m, decL_m, (328, 338), (-2, 5), "W4", _label=f"$R_E$< {np.nanmedian(R)}")
 plot_sub_data(axes, [1, 1], raL_p, decL_p, (328, 338),
-              (-2, 5), "W4", _marker='o', color='blue', _label = '>0.5')
+              (-2, 5), "W4", _marker='o', color='blue', _label = f"$R_E\geq$ {np.nanmedian(R)}")
 fig.legend()
 
 make_global_title(
@@ -358,7 +358,7 @@ ax3.hist(expo_p, alpha=0.5, density=True,
 ax3.set_xlabel("Exposition (min)")
 ax3.set_yabel("Densité")
 ax3.legend()
-plt.suptitle("Histogrammes de densité de seeing des lentilles en fonction du rayon d'Einstein")
+plt.suptitle("Histogrammes de densité d'exposition des lentilles en fonction du rayon d'Einstein")
 
 plt.show()
 
