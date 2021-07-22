@@ -1,3 +1,5 @@
+# Chargement des packages et classes 
+
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,10 +13,16 @@ import scipy.stats as scs
 from python.objets.wobjet import WDegCarre
 from python.objets.lentille import LentilleGravita
 
-
+# Lien pour charger les données pickle
 lentilles_list = pickle.load(open("./source_pickle/lentilles_list2", "rb"))
 obj_list = pickle.load(open("./source_pickle/fields", "rb"))
 
+
+# Useful functions
+def centrer_reduit(array):
+    return (array-np.mean(array))/np.std(array)
+
+# Création des listes pour afficher le seeing
 # -- listes de données seeing
 seeing_list_lentille = np.array([lentille.seeing for lentille in lentilles_list])
 seeing_list_obj = np.array([obj.seeing for obj in obj_list])
@@ -22,9 +30,6 @@ seeing_list_obj = np.array([obj.seeing for obj in obj_list])
 seeing_list_lentille_noNA = seeing_list_lentille[~np.isnan(seeing_list_lentille)]
 seeing_list_obj_noNA = seeing_list_obj[~np.isnan(seeing_list_obj)]
 
-
-def centrer_reduit(array):
-    return (array-np.mean(array))/np.std(array)
 
 seeing_list_lentille_01 = centrer_reduit(seeing_list_lentille_noNA)
 seeing_list_obj_01 = centrer_reduit(seeing_list_obj_noNA)
@@ -149,6 +154,215 @@ for i in range(N):
 
     _, p_values[i] = scs.wilcoxon(x=expo_list_lentille_noNA, y=expo_list_obj_noNA_len, alternative="two-sided")
 np.mean(p_values)
+
+
+
+
+
+# -- Rappel de la distribution spatiale des lentilles
+raL, decL = [lent.ra for lent in lentilles_list], [lent.dec for lent in lentilles_list]
+
+fig, axes = plt.subplots(2, 2)
+plot_sub_data(axes, [0, 0], raL, decL, (30, 40), (-14, -2), "W1")
+plot_sub_data(axes, [0, 1], raL, decL, (131, 138), (-6, 0), "W2")
+plot_sub_data(axes, [1, 0], raL, decL, (205, 225), (50, 60), "W3")
+plot_sub_data(axes, [1, 1], raL, decL, (328, 338), (-2, 5), "W4")
+
+make_global_title(
+    fig,
+    title="Portion de champs et dispositions des lentilles gravitationelles",
+    x_title="Ascension droite (deg)",
+    y_title="Déclinaison (deg)")
+
+plt.show()
+
+# -- Distribution spatiale des lentilles en fonction du redshift
+raL_m, decL_m = [lent.ra for lent in lentilles_list if lent.z < 0.5], [lent.dec for lent in lentilles_list if lent.z < 0.5]
+raL_p, decL_p = [lent.ra for lent in lentilles_list if lent.z >= 0.5], [lent.dec for lent in lentilles_list if lent.z >= 0.5]
+
+
+fig, axes = plt.subplots(2, 2)
+plot_sub_data(axes, [0, 0], raL_m, decL_m, (30, 40), (-14, -2), "W1")
+plot_sub_data(axes, [0, 0], raL_p, decL_p, (30, 40),
+              (-14, -2), "W1",_marker='o', color='blue')
+
+plot_sub_data(axes, [0, 1], raL_m, decL_m, (131, 138), (-6, 0), "W2")
+plot_sub_data(axes, [0, 1], raL_p, decL_p, (131, 138),
+              (-6, 0), "W2", _marker='o', color='blue')   
+
+plot_sub_data(axes, [1, 0], raL_m, decL_m, (205, 225), (50, 60), "W3")
+plot_sub_data(axes, [1, 0], raL_p, decL_p, (205, 225),
+              (50, 60), "W3", _marker='o', color='blue')
+
+plot_sub_data(axes, [1, 1], raL_m, decL_m, (328, 338), (-2, 5), "W4", _label = "<0.5")
+plot_sub_data(axes, [1, 1], raL_p, decL_p, (328, 338),
+              (-2, 5), "W4", _marker='o', color='blue', _label = '>0.5')
+fig.legend()
+
+make_global_title(
+    fig,
+    title="Portion de champs et dispositions des lentilles gravitationelles en fonction du redshift",
+    x_title="Ascension droite (deg)",
+    y_title="Déclinaison (deg)")
+
+plt.show()
+
+
+# -- Histograme de seeing en fonction du redshift
+
+see_m, see_p = [lent.seeing for lent in lentilles_list if lent.z < 0.5], [lent.seeing for lent in lentilles_list if lent.z >= 0.5]
+
+ax1 = plt.subplot(221)
+ax1.hist(see_m, density=True)
+ax1.set_title(f"z<0.5 (n={len(see_m)})")
+ax1.set_xlabel("Seeing (arc sec)")
+ax1.set_yabel("Densité")
+
+
+ax2 = plt.subplot(222)
+ax2.hist(see_p, density=True)
+ax2.set_title(f"z$\geq$0.5 (n={len(see_p)})")
+ax2.set_xlabel("Seeing (arc sec)")
+ax2.set_yabel("Densité")
+
+
+ax3 = plt.subplot(212)
+ax3.hist(see_m, alpha=0.5, density=True, label=f"z<0.5 (n={len(see_m)})")
+ax3.hist(see_p, alpha=0.5, density=True, label=f"z$\geq$0.5 (n={len(see_p)})")
+ax3.set_xlabel("Seeing (arc sec)")
+ax3.set_yabel("Densité")
+ax3.legend()
+plt.suptitle("Histogrammes de densité de seeing des lentilles en fonction du redshift")
+
+plt.show()
+
+# -- Histograme de l'exposition en fonction du redshift
+
+expo_m, expo_p = [lent.exposition for lent in lentilles_list if lent.z < 0.5], [lent.exposition for lent in lentilles_list if lent.z >= 0.5]
+
+ax1 = plt.subplot(221)
+ax1.hist(expo_m, density=True)
+ax1.set_title(f"z<0.5 (n={len(expo_m)})")
+ax1.set_xlabel("Exposition (min)")
+ax1.set_yabel("Densité")
+
+
+ax2 = plt.subplot(222)
+ax2.hist(expo_p, density=True)
+ax2.set_title(f"z$\geq$0.5 (n={len(expo_p)})")
+ax2.set_xlabel("Exposition (min)")
+ax2.set_yabel("Densité")
+
+
+ax3 = plt.subplot(212)
+ax3.hist(expo_m, alpha=0.5, density=True, label=f"z<0.5 (n={len(expo_m)})")
+ax3.hist(expo_p, alpha=0.5, density=True, label=f"z$\geq$0.5 (n={len(expo_p)})")
+ax3.set_xlabel("Exposition (min)")
+ax3.set_yabel("Densité")
+ax3.legend()
+plt.suptitle("Histogrammes de densité de seeing des lentilles en fonction du redshift")
+
+plt.show()
+
+
+
+
+
+
+# -- Distribution spatiale des lentilles en fonction du rayon d'einstein
+R = np.array([l.rad for l in lentilles_list])
+# np.nanmedian(R)
+
+raL_m, decL_m = [lent.ra for lent in lentilles_list if lent.rad < np.nanmedian(R)], [lent.dec for lent in lentilles_list if lent.rad < np.nanmedian(R)]
+raL_p, decL_p = [lent.ra for lent in lentilles_list if lent.rad >= np.nanmedian(R)], [lent.dec for lent in lentilles_list if lent.rad >= np.nanmedian(R)]
+
+
+fig, axes = plt.subplots(2, 2)
+plot_sub_data(axes, [0, 0], raL_m, decL_m, (30, 40), (-14, -2), "W1")
+plot_sub_data(axes, [0, 0], raL_p, decL_p, (30, 40),
+              (-14, -2), "W1",_marker='o', color='blue')
+
+plot_sub_data(axes, [0, 1], raL_m, decL_m, (131, 138), (-6, 0), "W2")
+plot_sub_data(axes, [0, 1], raL_p, decL_p, (131, 138),
+              (-6, 0), "W2", _marker='o', color='blue')   
+
+plot_sub_data(axes, [1, 0], raL_m, decL_m, (205, 225), (50, 60), "W3")
+plot_sub_data(axes, [1, 0], raL_p, decL_p, (205, 225),
+              (50, 60), "W3", _marker='o', color='blue')
+
+plot_sub_data(axes, [1, 1], raL_m, decL_m, (328, 338), (-2, 5), "W4", _label = "<0.5")
+plot_sub_data(axes, [1, 1], raL_p, decL_p, (328, 338),
+              (-2, 5), "W4", _marker='o', color='blue', _label = '>0.5')
+fig.legend()
+
+make_global_title(
+    fig,
+    title="Portion de champs et dispositions des lentilles gravitationelles en fonction du rayon d'Einstein",
+    x_title="Ascension droite (deg)",
+    y_title="Déclinaison (deg)")
+
+plt.show()
+
+
+# -- Histograme de seeing en fonction du rayon d'Einstein
+
+see_m, see_p = [lent.seeing for lent in lentilles_list if lent.rad < np.nanmedian(R)], [lent.seeing for lent in lentilles_list if lent.rad >= np.nanmedian(R)]
+
+ax1 = plt.subplot(221)
+ax1.hist(see_m, density=True)
+ax1.set_title(f"$R_E$<{np.nanmedian(R)} (n={len(see_m)})")
+ax1.set_xlabel("Seeing (arc sec)")
+ax1.set_yabel("Densité")
+
+
+ax2 = plt.subplot(222)
+ax2.hist(see_p, density=True)
+ax2.set_title(f"$R_E\geq$ {np.nanmedian(R)} (n={len(see_p)})")
+ax2.set_xlabel("Seeing (arc sec)")
+ax2.set_yabel("Densité")
+
+
+ax3 = plt.subplot(212)
+ax3.hist(see_m, alpha=0.5, density=True, label=f"$R_E$<{np.nanmedian(R)} (n={len(see_m)})")
+ax3.hist(see_p, alpha=0.5, density=True, label=f"$R_E\geq$ {np.nanmedian(R)} (n={len(see_p)})")
+ax3.set_xlabel("Seeing (arc sec)")
+ax3.set_yabel("Densité")
+ax3.legend()
+plt.suptitle("Histogrammes de densité de seeing des lentilles en fonction du redshift")
+
+plt.show()
+
+# -- Histograme de l'exposition en fonction du redshift
+
+expo_m, expo_p = [lent.exposition for lent in lentilles_list if lent.rad < np.nanmedian(R)], [lent.exposition for lent in lentilles_list if lent.rad >= np.nanmedian(R)]
+
+ax1 = plt.subplot(221)
+ax1.hist(expo_m, density=True)
+ax1.set_title(f"$R_E$<{np.nanmedian(R)} (n={len(expo_m)})")
+ax1.set_xlabel("Exposition (min)")
+ax1.set_yabel("Densité")
+
+
+ax2 = plt.subplot(222)
+ax2.hist(expo_p, density=True)
+ax2.set_title(f"$R_E\geq$ {np.nanmedian(R)}(n={len(expo_p)})")
+ax2.set_xlabel("Exposition (min)")
+ax2.set_yabel("Densité")
+
+
+ax3 = plt.subplot(212)
+ax3.hist(expo_m, alpha=0.5, density=True,
+         label=f"$R_E$<{np.nanmedian(R)} (n={len(expo_m)})")
+ax3.hist(expo_p, alpha=0.5, density=True,
+         label=f"$R_E\geq$ {np.nanmedian(R)}(n={len(expo_p)})")
+ax3.set_xlabel("Exposition (min)")
+ax3.set_yabel("Densité")
+ax3.legend()
+plt.suptitle("Histogrammes de densité de seeing des lentilles en fonction du rayon d'Einstein")
+
+plt.show()
+
+
 
 # -- Etude selon le rayon d'Einstein
 bins = np.linspace(0, 20, 50)
