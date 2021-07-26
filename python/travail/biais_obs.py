@@ -182,21 +182,21 @@ raL_p, decL_p = [lent.ra for lent in lentilles_list if lent.z >= 0.5], [lent.dec
 
 
 fig, axes = plt.subplots(2, 2)
-plot_sub_data(axes, [0, 0], raL_m, decL_m, (30, 40), (-14, -2), "W1")
-plot_sub_data(axes, [0, 0], raL_p, decL_p, (30, 40),
+plot_sub_data(axes, [0, 0], raL_p, decL_p, (30, 40), (-14, -2), "W1")
+plot_sub_data(axes, [0, 0], raL_m, decL_m, (30, 40),
               (-14, -2), "W1",_marker='o', color='blue')
 
-plot_sub_data(axes, [0, 1], raL_m, decL_m, (131, 138), (-6, 0), "W2")
-plot_sub_data(axes, [0, 1], raL_p, decL_p, (131, 138),
+plot_sub_data(axes, [0, 1], raL_p, decL_p, (131, 138), (-6, 0), "W2")
+plot_sub_data(axes, [0, 1], raL_m, decL_m, (131, 138),
               (-6, 0), "W2", _marker='o', color='blue')   
 
-plot_sub_data(axes, [1, 0], raL_m, decL_m, (205, 225), (50, 60), "W3")
-plot_sub_data(axes, [1, 0], raL_p, decL_p, (205, 225),
+plot_sub_data(axes, [1, 0], raL_p, decL_p, (205, 225), (50, 60), "W3")
+plot_sub_data(axes, [1, 0], raL_m, decL_m, (205, 225),
               (50, 60), "W3", _marker='o', color='blue')
 
-plot_sub_data(axes, [1, 1], raL_m, decL_m, (328, 338), (-2, 5), "W4", _label = "redshift<0.5")
-plot_sub_data(axes, [1, 1], raL_p, decL_p, (328, 338),
-              (-2, 5), "W4", _marker='o', color='blue', _label = 'redshift$\geq$0.5')
+plot_sub_data(axes, [1, 1], raL_p, decL_p, (328, 338), (-2, 5), "W4", _label = 'redshift$\geq$0.5')
+plot_sub_data(axes, [1, 1], raL_m, decL_m, (328, 338),
+              (-2, 5), "W4", _marker='o', color='blue', _label = 'redshift < 0.5')
 fig.legend()
 
 make_global_title(
@@ -328,11 +328,11 @@ ax3.hist(see_p, alpha=0.5, density=True, label=f"$R_E\geq$ {np.nanmedian(R)} (n=
 ax3.set_xlabel("Seeing (arc sec)")
 ax3.set_yabel("Densité")
 ax3.legend()
-plt.suptitle("Histogrammes de densité de seeing des lentilles en fonction du redshift")
+plt.suptitle("Histogrammes de densité de seeing des lentilles en fonction du rayon d'Einstein")
 
 plt.show()
 
-# -- Histograme de l'exposition en fonction du redshift
+# -- Histograme de l'exposition en fonction du rayon d'Einstein
 
 expo_m, expo_p = [lent.exposition for lent in lentilles_list if lent.rad < np.nanmedian(R)], [lent.exposition for lent in lentilles_list if lent.rad >= np.nanmedian(R)]
 
