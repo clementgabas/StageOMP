@@ -1,3 +1,5 @@
 source/
 *.pdf
 !rapport.pdf
+notebooks
+!*.ipynb

@@ -8,6 +8,7 @@ import statsmodels.api as sm
 from python.plotfunctions import *
 from scipy.stats import norm
 import scipy.stats as scs
+import matplotlib.patches as patches
 
 #--- load classes
 from python.objets.wobjet import WDegCarre
@@ -163,17 +164,35 @@ np.mean(p_values)
 raL, decL = [lent.ra for lent in lentilles_list], [lent.dec for lent in lentilles_list]
 
 fig, axes = plt.subplots(2, 2)
-plot_sub_data(axes, [0, 0], raL, decL, (30, 40), (-14, -2), "W1")
-plot_sub_data(axes, [0, 1], raL, decL, (131, 138), (-6, 0), "W2")
-plot_sub_data(axes, [1, 0], raL, decL, (205, 225), (50, 60), "W3")
-plot_sub_data(axes, [1, 1], raL, decL, (328, 338), (-2, 5), "W4")
+plot_sub_data(axes, [0, 0], raL, decL, (29, 40), (-12, -3), "W1")
+plot_sub_data(axes, [0, 1], raL, decL, (131, 137), (-5, 1), "W2")
+plot_sub_data(axes, [1, 0], raL, decL, (208, 220), (50, 59), "W3")
+plot_sub_data(axes, [1, 1], raL, decL, (329, 336), (-2, 5), "W4")
+
+#add fields
+W1_rect = patches.Rectangle(xy=(30, -11.5), width=9, height=8, linewidth=1, edgecolor='royalblue', facecolor='none')
+W2_rect = patches.Rectangle(xy=(131.4542, -4.3167), width=5, height=5, linewidth=1, edgecolor='royalblue', facecolor='none')
+W3_rect = patches.Rectangle(xy=(208.975, 51.0086), width=10, height=7, linewidth=1, edgecolor='royalblue', facecolor='none')
+W4_cx, W4_cy = (333.3250, 1.3167)
+W4_coord = [[W4_cx-1.5, W4_cy-2.5], [W4_cx+2.5, W4_cy-2.5], [W4_cx+2.5, W4_cy+0.5],
+            [W4_cx+1.5, W4_cy+.5], [W4_cx+1.5, W4_cy+1.5], [W4_cx-.5, W4_cy+1.5],
+            [W4_cx-.5, W4_cy+3.5], [W4_cx-3.5, W4_cy+3.5], [W4_cx-3.5, W4_cy-.5],
+            [W4_cx-1.5, W4_cy-.5]]
+W4_coord.append([W4_cx-1.5, W4_cy-2.5])
+W4_xs, W4_ys = zip(*W4_coord)
+
+axes[0, 0].add_patch(W1_rect)
+axes[0, 1].add_patch(W2_rect)
+axes[1, 0].add_patch(W3_rect)
+axes[1, 1].plot(W4_xs, W4_ys, color='royalblue', label='contours du champ')
+
 
 make_global_title(
     fig,
     title="Portion de champs et dispositions des lentilles gravitationelles",
     x_title="Ascension droite (deg)",
     y_title="Déclinaison (deg)")
-
+fig.legend()
 plt.show()
 
 # -- Distribution spatiale des lentilles en fonction du redshift
