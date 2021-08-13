@@ -185,8 +185,8 @@ def plot_2pts_corr(N_bootstrap=5000, rd_seed=90):
 
     # W1
     dfw1 = df[df["Field"] == "W1"]
-    dfd1 = df[(df["Field"] == "D1") & (df["Arc Radius $R_A$ (arcsec)"] >= 2.8)]
-    dfw1 = pd.concat([dfw1, dfd1], axis=0)
+    #dfd1 = df[(df["Field"] == "D1") & (df["Arc Radius $R_A$ (arcsec)"] >= 2.8)]
+    # dfw1 = pd.concat([dfw1, dfd1], axis=0)
 
     corr, dcorr, bootstraps = amlc.bootstrap_two_point_angular(
         ra=dfw1["Right ascension"], dec=dfw1["Declination"], bins=_bins, method="landy-szalay", Nbootstraps=N_bootstrap,  random_state=rd_seed)
@@ -197,8 +197,8 @@ def plot_2pts_corr(N_bootstrap=5000, rd_seed=90):
     axes[0, 0].hlines(y=1, xmin=min(_bins), xmax=max(_bins), colors='red', linestyles='dotted')
     axes[0, 0].hlines(y=-1, xmin=min(_bins), xmax=max(_bins), colors='red', linestyles='dotted')
 
-    axes[0, 0].hlines(y=np.mean(corr), xmin=min(_bins), xmax=max(_bins), colors='black', linestyles='solid', label=f'mean correlation = {round(np.nanmean(corr), 2)}')
-    axes[0, 0].hlines(y=np.median(corr), xmin=min(_bins), xmax=max(_bins), colors='grey', linestyles='solid', label=f'median correlation = {round(np.nanmedian(corr), 2)}')
+    axes[0, 0].hlines(y=np.nanmean(corr), xmin=min(_bins), xmax=max(_bins), colors='black', linestyles='solid', label=f'mean correlation = {round(np.nanmean(corr), 2)}')
+    axes[0, 0].hlines(y=np.nanmedian(corr), xmin=min(_bins), xmax=max(_bins), colors='grey', linestyles='solid', label=f'median correlation = {round(np.nanmedian(corr), 2)}')
 
 
     axes[0, 0].errorbar(_bins[1: len(_bins)], corr, yerr=dcorr, label='corrélation à 2 points', color='blue')
@@ -206,7 +206,7 @@ def plot_2pts_corr(N_bootstrap=5000, rd_seed=90):
     #errorfill(_bins[1: len(_bins)], corr, yerr=dcorr)
 
     axes[0, 0].legend(loc='lower right')
-    axes[0, 0].set_title("W1 & D1")
+    axes[0, 0].set_title(f"W1 (n={len(dfw1)})")
     # W2
     dfw2 = df[df["Field"] == "W2"]
 
@@ -220,9 +220,9 @@ def plot_2pts_corr(N_bootstrap=5000, rd_seed=90):
     axes[0, 1].hlines(y=-1, xmin=min(_bins), xmax=max(_bins),
             colors='red', linestyles='dotted')
 
-    axes[0, 1].hlines(y=np.mean(corr), xmin=min(_bins), xmax=max(_bins), colors='black',
+    axes[0, 1].hlines(y=np.nanmean(corr), xmin=min(_bins), xmax=max(_bins), colors='black',
             linestyles='solid', label=f'mean correlation = {round(np.nanmean(corr), 2)}')
-    axes[0, 1].hlines(y=np.median(corr), xmin=min(_bins), xmax=max(_bins), colors='grey',
+    axes[0, 1].hlines(y=np.nanmedian(corr), xmin=min(_bins), xmax=max(_bins), colors='grey',
             linestyles='solid', label=f'median correlation = {round(np.nanmedian(corr), 2)}')
 
 
@@ -232,11 +232,11 @@ def plot_2pts_corr(N_bootstrap=5000, rd_seed=90):
     #errorfill(_bins[1: len(_bins)], corr, yerr=dcorr)
 
     axes[0, 1].legend(loc='lower right')
-    axes[0, 1].set_title("W2")
+    axes[0, 1].set_title(f"W2 (n={len(dfw2)})")
     # W3 
     dfw3 = df[df["Field"] == "W3"]
-    dfd3 = df[df["Field"] == "D3"]
-    dfw1 = pd.concat([dfw3, dfd3], axis=0)
+    #dfd3 = df[df["Field"] == "D3"]
+    #dfw1 = pd.concat([dfw3, dfd3], axis=0)
 
     corr, dcorr, bootstraps = amlc.bootstrap_two_point_angular(
         ra=dfw3["Right ascension"], dec=dfw3["Declination"], bins=_bins, method="landy-szalay", Nbootstraps=N_bootstrap, random_state=rd_seed)
@@ -249,9 +249,9 @@ def plot_2pts_corr(N_bootstrap=5000, rd_seed=90):
     axes[1, 0].hlines(y=-1, xmin=min(_bins), xmax=max(_bins),
             colors='red', linestyles='dotted')
 
-    axes[1, 0].hlines(y=np.mean(corr), xmin=min(_bins), xmax=max(_bins), colors='black',
+    axes[1, 0].hlines(y=np.nanmean(corr), xmin=min(_bins), xmax=max(_bins), colors='black',
             linestyles='solid', label=f'mean correlation = {round(np.nanmean(corr), 2)}')
-    axes[1, 0].hlines(y=np.median(corr), xmin=min(_bins), xmax=max(_bins), colors='grey',
+    axes[1, 0].hlines(y=np.nanmedian(corr), xmin=min(_bins), xmax=max(_bins), colors='grey',
             linestyles='solid', label=f'median correlation = {round(np.nanmedian(corr), 2)}')
 
 
@@ -261,7 +261,7 @@ def plot_2pts_corr(N_bootstrap=5000, rd_seed=90):
     # errorfill(_bins[1: len(_bins)], corr, yerr=dcorr)
 
     axes[1, 0].legend(loc='lower right')
-    axes[1, 0].set_title("W3 & D3")
+    axes[1, 0].set_title(f"W3 (n={len(dfw3)})")
 
     #W4
     dfw4 = df[df["Field"] == "W4"]
@@ -277,9 +277,9 @@ def plot_2pts_corr(N_bootstrap=5000, rd_seed=90):
     axes[1, 1].hlines(y=-1, xmin=min(_bins), xmax=max(_bins),
             colors='red', linestyles='dotted')
 
-    axes[1, 1].hlines(y=np.mean(corr), xmin=min(_bins), xmax=max(_bins), colors='black',
+    axes[1, 1].hlines(y=np.nanmean(corr), xmin=min(_bins), xmax=max(_bins), colors='black',
             linestyles='solid', label=f'mean correlation = {round(np.nanmean(corr), 2)}')
-    axes[1, 1].hlines(y=np.median(corr), xmin=min(_bins), xmax=max(_bins), colors='grey',
+    axes[1, 1].hlines(y=np.nanmedian(corr), xmin=min(_bins), xmax=max(_bins), colors='grey',
             linestyles='solid', label=f'median correlation = {round(np.nanmedian(corr), 2)}')
 
 
@@ -289,13 +289,13 @@ def plot_2pts_corr(N_bootstrap=5000, rd_seed=90):
     # errorfill(_bins[1: len(_bins)], corr, yerr=dcorr)
 
     axes[1, 1].legend(loc='lower right')
-    axes[1, 1].set_title("W4")
+    axes[1, 1].set_title(f"W4 (n={len(dfw4)})")
     
     fig.suptitle("Fonction de corrélation à 2 points $\zeta$ par estimateur de Landy-Szalay sur les différents champs W1-4")
     fig.supxlabel("r")
     fig.supylabel("Corrélation")
     
-    plt.draw()
+    plt.show()
 plot_2pts_corr(rd_seed=15)
 
 """
