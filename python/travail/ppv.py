@@ -44,12 +44,19 @@ class Lense:
                 curent_NN = galaxy
         return (curent_NN, current_NN_dist)
     
+    def compute_number_neighbor_in_R_forZ(self, R, list_of_galaxies):
+        number_of_neighbor = 0
+        for galaxy in list_of_galaxies:
+            if self.distance(galaxy) < R and galaxy.redshift >= 1.5*self.redshift:
+                number_of_neighbor += 1
+        return number_of_neighbor
+    
     def compute_number_neighbor_in_R(self, R, list_of_galaxies):
         number_of_neighbor = 0
         for galaxy in list_of_galaxies:
             if self.distance(galaxy) < R:
                 number_of_neighbor += 1
-        return number_of_neighbor 
+        return number_of_neighbor
     
 class Galaxy:
     
@@ -83,10 +90,14 @@ W4_results_dict = {}
 for lense in W4_lenses_list:
     W4_results_dict[lense.ID] = {
         "3R": 0,
-        "4R": 0
+        "4R": 0,
+        "3RZ": 0,
+        "4RZ": 0
         }
     W4_results_dict[lense.ID]["3R"] = lense.compute_number_neighbor_in_R(R=3*lense.re, list_of_galaxies=W4_galaxies_list)
     W4_results_dict[lense.ID]["4R"] = lense.compute_number_neighbor_in_R(R=4*lense.re, list_of_galaxies=W4_galaxies_list)
+    W4_results_dict[lense.ID]["3RZ"] = lense.compute_number_neighbor_in_R_forZ(R=3*lense.re, list_of_galaxies=W4_galaxies_list)
+    W4_results_dict[lense.ID]["4RZ"] = lense.compute_number_neighbor_in_R_forZ(R=4*lense.re, list_of_galaxies=W4_galaxies_list)
     W4_results_dict[lense.ID]["RA"] = lense.ra
     W4_results_dict[lense.ID]["DEC"] = lense.dec
 W4_results_df = pd.DataFrame.from_dict(W4_results_dict, orient='index')
@@ -122,10 +133,14 @@ W3_results_dict = {}
 for lense in W3_lenses_list:
     W3_results_dict[lense.ID] = {
         "3R": 0,
-        "4R": 0
+        "4R": 0,
+        "3RZ":0,
+        "4RZ": 0
         }
     W3_results_dict[lense.ID]["3R"] = lense.compute_number_neighbor_in_R(R=3*lense.re, list_of_galaxies=W3_galaxies_list)
     W3_results_dict[lense.ID]["4R"] = lense.compute_number_neighbor_in_R(R=4*lense.re, list_of_galaxies=W3_galaxies_list)
+    W3_results_dict[lense.ID]["3RZ"] = lense.compute_number_neighbor_in_R_forZ(R=3*lense.re, list_of_galaxies=W3_galaxies_list)
+    W3_results_dict[lense.ID]["4RZ"] = lense.compute_number_neighbor_in_R_forZ(R=4*lense.re, list_of_galaxies=W3_galaxies_list)
     W3_results_dict[lense.ID]["RA"] = lense.ra
     W3_results_dict[lense.ID]["DEC"] = lense.dec
 W3_results_df = pd.DataFrame.from_dict(W3_results_dict, orient='index')
@@ -162,11 +177,17 @@ W2_results_dict = {}
 for lense in W2_lenses_list:
     W2_results_dict[lense.ID] = {
         "3R": 0,
-        "4R": 0
+        "4R": 0,
+        "3RZ": 0,
+        "4RZ": 0
     }
     W2_results_dict[lense.ID]["3R"] = lense.compute_number_neighbor_in_R(
         R=3*lense.re, list_of_galaxies=W2_galaxies_list)
     W2_results_dict[lense.ID]["4R"] = lense.compute_number_neighbor_in_R(
+        R=4*lense.re, list_of_galaxies=W2_galaxies_list)
+    W2_results_dict[lense.ID]["3RZ"] = lense.compute_number_neighbor_in_R_forZ(
+        R=3*lense.re, list_of_galaxies=W2_galaxies_list)
+    W2_results_dict[lense.ID]["4RZ"] = lense.compute_number_neighbor_in_R_forZ(
         R=4*lense.re, list_of_galaxies=W2_galaxies_list)
     W2_results_dict[lense.ID]["RA"] = lense.ra
     W2_results_dict[lense.ID]["DEC"] = lense.dec
@@ -216,11 +237,17 @@ W1_results_dict = {}
 for lense in W1_lenses_list:
     W1_results_dict[lense.ID] = {
         "3R": 0,
-        "4R": 0
+        "4R": 0,
+        "3RZ": 0,
+        "4RZ": 0
     }
     W1_results_dict[lense.ID]["3R"] = lense.compute_number_neighbor_in_R(
         R=3*lense.re, list_of_galaxies=W1_galaxies_list)
     W1_results_dict[lense.ID]["4R"] = lense.compute_number_neighbor_in_R(
+        R=4*lense.re, list_of_galaxies=W1_galaxies_list)
+    W1_results_dict[lense.ID]["3RZ"] = lense.compute_number_neighbor_in_R_forZ(
+        R=3*lense.re, list_of_galaxies=W1_galaxies_list)
+    W1_results_dict[lense.ID]["4RZ"] = lense.compute_number_neighbor_in_R_forZ(
         R=4*lense.re, list_of_galaxies=W1_galaxies_list)
     W1_results_dict[lense.ID]["RA"] = lense.ra
     W1_results_dict[lense.ID]["DEC"] = lense.dec
@@ -245,6 +272,14 @@ W3_results_df["3Rd"] = W3_results_df["3R"]/65305
 W3_results_df["4Rd"] = W3_results_df["4R"]/65305
 W4_results_df["3Rd"] = W4_results_df["3R"]/70618
 W4_results_df["4Rd"] = W4_results_df["4R"]/70618
+W1_results_df["3RZd"] = W1_results_df["3RZ"]/64072
+W1_results_df["4RZd"] = W1_results_df["4RZ"]/64072
+W2_results_df["3RZd"] = W2_results_df["3RZ"]/72939
+W2_results_df["4RZd"] = W2_results_df["4RZ"]/72939
+W3_results_df["3RZd"] = W3_results_df["3RZ"]/65305
+W3_results_df["4RZd"] = W3_results_df["4RZ"]/65305
+W4_results_df["3RZd"] = W4_results_df["3RZ"]/70618
+W4_results_df["4RZd"] = W4_results_df["4RZ"]/70618
 
 allW_results_df = pd.concat(
     [W1_results_df, W2_results_df, W3_results_df, W4_results_df], axis=0)
@@ -266,16 +301,24 @@ from sklearn import *
 
 _bins = np.linspace(0, max(allW_results_df['4R']), 50)
 __bins = np.linspace(-10, max(allW_results_df['4R']), 50000)
-
 plt.hist([allW_results_df['4R'], allW_results_df['3R']],
-         bins=_bins, label=['4r', '3r'], density=True)
+         bins=_bins, label=[r'4$R_E$', r'3$R_E$'], density=True)
 kde4 = stats.gaussian_kde(allW_results_df['4R'], bw_method=0.03)
 #plt.plot(__bins, kde4(__bins), color='blue', label='kde density 4R')
 kde3 = stats.gaussian_kde(allW_results_df['3R'], bw_method=0.03)
 #plt.plot(__bins, kde3(__bins), color='orange', label='kde density 3R')
 plt.legend()
-plt.title("Nombre de galaxies voisines pour chaque lentille dans un rayon de 3 et 4 $R_E$ pour les champs W1-4")
-plt.xlabel("Nombre de galaxies voisines / densité de galaxies par $deg^2$ dans le champ")
+plt.title("Histogramme du nombre de galaxies voisines pour chaque lentille dans un rayon de 3 et 4 $R_E$ pour les champs W1-4")
+plt.xlabel("Nombre de galaxies voisines")
+plt.show()
+
+_bins = np.linspace(0, max(allW_results_df['4RZ']), 50)
+__bins = np.linspace(-10, max(allW_results_df['4RZ']), 50000)
+plt.hist([allW_results_df['4RZ'], allW_results_df['3RZ']], bins=_bins, label=['4rz', '3rz'], density=True)
+plt.legend()
+plt.title("Histogramme du nombre de galaxies voisines dans un rayon de 3 et 4 $R_E$ de la lentille pour les champs W1-4 \nLes galaxies composant la lentille sont retirées.")
+plt.xlabel(
+    "Nombre de galaxies voisines")
 plt.show()
 
 
@@ -301,89 +344,90 @@ plt.show()
 
 
 fig, (ax1, ax2) = plt.subplots(2, 1)
-_bins = np.linspace(0, max(allW_results_df['3R']), 50)
-__bins = np.linspace(0, max(allW_results_df['3R']), 50000)
+_bins = np.linspace(0, max(allW_results_df['3RZ']), 15)
+__bins = np.linspace(0, max(allW_results_df['3RZ']), 50000)
 
-ax1.hist([W1_results_df['3R'], W2_results_df['3R'], W3_results_df['3R'], W4_results_df['3R']],
-         bins=_bins, label=['W1', 'W2', 'W3', 'W4'], density=True,alpha=.5)
+ax1.hist([W1_results_df['3RZ'], W2_results_df['3RZ'], W3_results_df['3RZ'], W4_results_df['3RZ']],
+         bins=_bins, label=['W1', 'W2', 'W3', 'W4'], density=True,alpha=1)
 
-kde1 = stats.gaussian_kde(W1_results_df['3R'], bw_method=1)
-ax1.plot(__bins, kde1(__bins), color='blue')
-kde2 = stats.gaussian_kde(W2_results_df['3R'], bw_method=1)
-ax1.plot(__bins, kde2(__bins), color='orange')
-kde3 = stats.gaussian_kde(W3_results_df['3R'], bw_method=1)
-ax1.plot(__bins, kde3(__bins), color='green')
-kde4 = stats.gaussian_kde(W4_results_df['3R'], bw_method=1)
-ax1.plot(__bins, kde4(__bins), color='red')
+kde1 = stats.gaussian_kde(W1_results_df['3RZ'], bw_method=1)
+#ax1.plot(__bins, kde1(__bins), color='blue')
+kde2 = stats.gaussian_kde(W2_results_df['3RZ'], bw_method=1)
+#ax1.plot(__bins, kde2(__bins), color='orange')
+kde3 = stats.gaussian_kde(W3_results_df['3RZ'], bw_method=1)
+#ax1.plot(__bins, kde3(__bins), color='green')
+kde4 = stats.gaussian_kde(W4_results_df['3RZ'], bw_method=1)
+#ax1.plot(__bins, kde4(__bins), color='red')
 
 
 ax1.legend()
-ax1.set_title("Nombre de galaxies voisines pour chaque lentille dans un rayon de 3 $R_E$ pour les champs W1-4")
+ax1.set_title("Histogramme du nombre de galaxies voisines dans un rayon de 3 $R_E$ pour les champs W1-4.")
 
 
-__bins = np.linspace(0, max(allW_results_df['4R']), 50000)
-ax2.hist([W1_results_df['4R'], W2_results_df['4R'], W3_results_df['4R'], W4_results_df['4R']],
-         bins=_bins, label=['W1', 'W2', 'W3', 'W4'], density=True, alpha=.5)
+__bins = np.linspace(0, max(allW_results_df['4RZ']), 50000)
+ax2.hist([W1_results_df['4RZ'], W2_results_df['4RZ'], W3_results_df['4RZ'], W4_results_df['4RZ']],
+         bins=_bins, label=['W1', 'W2', 'W3', 'W4'], density=True, alpha=1)
 
-kde1 = stats.gaussian_kde(W1_results_df['4R'])
-ax2.plot(__bins, kde1(__bins), color='blue')
-kde2 = stats.gaussian_kde(W2_results_df['4R'])
-ax2.plot(__bins, kde2(__bins), color='orange')
-kde3 = stats.gaussian_kde(W3_results_df['4R'])
-ax2.plot(__bins, kde3(__bins), color='green')
-kde4 = stats.gaussian_kde(W4_results_df['4R'])
-ax2.plot(__bins, kde4(__bins), color='red')
+kde1 = stats.gaussian_kde(W1_results_df['4RZ'])
+#ax2.plot(__bins, kde1(__bins), color='blue')
+kde2 = stats.gaussian_kde(W2_results_df['4RZ'])
+#ax2.plot(__bins, kde2(__bins), color='orange')
+kde3 = stats.gaussian_kde(W3_results_df['4RZ'])
+#ax2.plot(__bins, kde3(__bins), color='green')
+kde4 = stats.gaussian_kde(W4_results_df['4RZ'])
+#ax2.plot(__bins, kde4(__bins), color='red')
 
 
 ax2.legend()
-ax2.set_title("Nombre de galaxies voisines pour chaque lentille dans un rayon de 4 $R_E$ pour les champs W1-4")
+ax2.set_title("Histogramme du nombre de galaxies voisines dans un rayon de 3 $R_E$ pour les champs W1-4.")
 ax2.set_xlabel(
     "Nombre de galaxies voisines dans le champ")
+fig.suptitle(r"Les galaxies qui composent les lentilles sont retirées.")
 plt.show()
 
 
-
-
 fig, (ax1, ax2) = plt.subplots(2, 1)
-_bins = np.linspace(0, max(allW_results_df['3Rd']), 50)
-__bins = np.linspace(-0.001, max(allW_results_df['3Rd']), 50000)
-ax1.hist([W1_results_df['3Rd'], W2_results_df['3Rd'], W3_results_df['3Rd'], W4_results_df['3Rd']],
-         bins=_bins, label=['W1', 'W2', 'W3', 'W4'], density=True, alpha=.5,)
+_bins = np.linspace(0, max(allW_results_df['3RZd']), 15)
+__bins = np.linspace(0, max(allW_results_df['3RZd']), 50000)
 
-kde1 = stats.gaussian_kde(W1_results_df['3Rd'])
-ax1.plot(__bins, kde1(__bins), color='blue')
-kde2 = stats.gaussian_kde(W2_results_df['3Rd'])
-ax1.plot(__bins, kde2(__bins), color='orange')
-kde3 = stats.gaussian_kde(W3_results_df['3Rd'])
-ax1.plot(__bins, kde3(__bins), color='green')
-kde4 = stats.gaussian_kde(W4_results_df['3Rd'])
-ax1.plot(__bins, kde4(__bins), color='red')
+ax1.hist([W1_results_df['3RZd'], W2_results_df['3RZd'], W3_results_df['3RZd'], W4_results_df['3RZd']],
+         bins=_bins, label=['W1', 'W2', 'W3', 'W4'], density=True, alpha=1)
+
+kde1 = stats.gaussian_kde(W1_results_df['3RZd'], bw_method=1)
+#ax1.plot(__bins, kde1(__bins), color='blue')
+kde2 = stats.gaussian_kde(W2_results_df['3RZd'], bw_method=1)
+#ax1.plot(__bins, kde2(__bins), color='orange')
+kde3 = stats.gaussian_kde(W3_results_df['3RZd'], bw_method=1)
+#ax1.plot(__bins, kde3(__bins), color='green')
+kde4 = stats.gaussian_kde(W4_results_df['3RZd'], bw_method=1)
+#ax1.plot(__bins, kde4(__bins), color='red')
 
 
 ax1.legend()
 ax1.set_title(
-    "Nombre de galaxies voisines pour chaque lentille dans un rayon de 3 $R_E$ pour les champs W1-4")
+    "Histogramme du nombre de galaxies voisines dans un rayon de 3 $R_E$ pour les champs W1-4.")
 
 
-__bins = np.linspace(-0.001, max(allW_results_df['4Rd']), 50000)
-ax2.hist([W1_results_df['4Rd'], W2_results_df['4Rd'], W3_results_df['4Rd'], W4_results_df['4Rd']],
-         bins=_bins, label=['W1', 'W2', 'W3', 'W4'], density=True, alpha=.5)
+__bins = np.linspace(0, max(allW_results_df['4RZd']), 50000)
+ax2.hist([W1_results_df['4RZd'], W2_results_df['4RZd'], W3_results_df['4RZd'], W4_results_df['4RZd']],
+         bins=_bins, label=['W1', 'W2', 'W3', 'W4'], density=True, alpha=1)
 
-kde1 = stats.gaussian_kde(W1_results_df['4Rd'])
-ax2.plot(__bins, kde1(__bins), color='blue')
-kde2 = stats.gaussian_kde(W2_results_df['4Rd'])
-ax2.plot(__bins, kde2(__bins), color='orange')
-kde3 = stats.gaussian_kde(W3_results_df['4Rd'])
-ax2.plot(__bins, kde3(__bins), color='green')
-kde4 = stats.gaussian_kde(W4_results_df['4Rd'])
-ax2.plot(__bins, kde4(__bins), color='red')
+kde1 = stats.gaussian_kde(W1_results_df['4RZd'])
+#ax2.plot(__bins, kde1(__bins), color='blue')
+kde2 = stats.gaussian_kde(W2_results_df['4RZd'])
+#ax2.plot(__bins, kde2(__bins), color='orange')
+kde3 = stats.gaussian_kde(W3_results_df['4RZd'])
+#ax2.plot(__bins, kde3(__bins), color='green')
+kde4 = stats.gaussian_kde(W4_results_df['4RZd'])
+#ax2.plot(__bins, kde4(__bins), color='red')
 
 
 ax2.legend()
 ax2.set_title(
-    "Nombre de galaxies voisines pour chaque lentille dans un rayon de 4 $R_E$ pour les champs W1-4")
+    "Histogramme du nombre de galaxies voisines dans un rayon de 3 $R_E$ pour les champs W1-4.")
 ax2.set_xlabel(
-    "Nombre de galaxies voisines / densité de galaxies par $deg^2$ dans le champ")
+    "Nombre de galaxies voisines dans le champ / densité de galaxie dans le champs")
+fig.suptitle(r"Les galaxies qui composent les lentilles sont retirées.")
 plt.show()
 
 
