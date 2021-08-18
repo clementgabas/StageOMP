@@ -161,12 +161,16 @@ np.mean(p_values)
 
 
 # -- Rappel de la distribution spatiale des lentilles
-raL, decL = [lent.ra for lent in lentilles_list], [lent.dec for lent in lentilles_list]
+raL, decL, field = [lent.ra for lent in lentilles_list], [lent.dec for lent in lentilles_list], [lent.w for lent in lentilles_list]
+raLD1, decLD1 = [ra for ra in raL if field[raL.index(ra)] == "D1" ], [dec for dec in decL if field[decL.index(dec)] == "D1" ]
+raLD3, decLD3 = [ra for ra in raL if field[raL.index(ra)] == "D3" ], [dec for dec in decL if field[decL.index(dec)] == "D3" ]
 
 fig, axes = plt.subplots(2, 2)
-plot_sub_data(axes, [0, 0], raL, decL, (29, 40), (-12, -3), "W1 & D1")
+plot_sub_data(axes, [0, 0], raL, decL, (29, 40), (-12, -3), "W1 & D1", _label="Lentilles du champ W")
+axes[0, 0].scatter(raLD1, decLD1, c='black', marker='+', label="Lentilles du champ D")
 plot_sub_data(axes, [0, 1], raL, decL, (131, 137), (-5, 1), "W2")
 plot_sub_data(axes, [1, 0], raL, decL, (208, 220), (50, 59), "W3 & D3")
+axes[1, 0].scatter(raLD3, decLD3, c='black', marker='+')
 plot_sub_data(axes, [1, 1], raL, decL, (329, 336), (-2, 5), "W4")
 
 #add fields

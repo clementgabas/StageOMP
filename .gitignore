@@ -3,3 +3,4 @@ source/
 !rapport.pdf
 notebooks
 !*.ipynb
+*.idea

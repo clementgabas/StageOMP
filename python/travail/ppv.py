@@ -281,8 +281,13 @@ W3_results_df["4RZd"] = W3_results_df["4RZ"]/65305
 W4_results_df["3RZd"] = W4_results_df["3RZ"]/70618
 W4_results_df["4RZd"] = W4_results_df["4RZ"]/70618
 
+
 allW_results_df = pd.concat(
     [W1_results_df, W2_results_df, W3_results_df, W4_results_df], axis=0)
+
+allW_results_df["3RZd6"] = round(allW_results_df["3RZd"]*10**6)
+allW_results_df["4RZd6"] = round(allW_results_df["4RZd"]*10**6)
+
 
 allW_results_df.to_csv('./source/ppv_results.csv')
 
@@ -293,12 +298,22 @@ W3_results_df = allW_results_df[allW_results_df["Field"]=="W3"]
 W4_results_df = allW_results_df[allW_results_df["Field"] == "W4"]
 
 
+len(allW_results_df)
+len(allW_results_df[allW_results_df["3RZ"] < 15]) / len(allW_results_df)
+
+x = 15
+len(W1_results_df[W1_results_df["3RZ"] <= x]) / len(W1_results_df)
+len(W2_results_df[W2_results_df["3RZ"] <= x]) / len(W2_results_df)
+len(W3_results_df[W3_results_df["3RZ"] <= x]) / len(W3_results_df)
+len(W4_results_df[W4_results_df["3RZ"] <= x]) / len(W4_results_df)
+
+
 
 
 # -- global
 from scipy import stats
 from sklearn import *
-
+# -------------------------------
 _bins = np.linspace(0, max(allW_results_df['4R']), 50)
 __bins = np.linspace(-10, max(allW_results_df['4R']), 50000)
 plt.hist([allW_results_df['4R'], allW_results_df['3R']],
@@ -320,7 +335,7 @@ plt.title("Histogramme du nombre de galaxies voisines dans un rayon de 3 et 4 $R
 plt.xlabel(
     "Nombre de galaxies voisines")
 plt.show()
-
+# ----------------------
 
 __bins = np.linspace(0, max(allW_results_df['4R']), 50000)
 plt.plot(__bins, kde4(__bins), color='green', label='kde density 4R')
@@ -342,7 +357,7 @@ plt.plot(__bins, stats.norm.pdf(__bins, loc=df_chi2, scale = (2*df_chi2)**1/2), 
 plt.legend()
 plt.show()
 
-
+# --------------------------------------------------------------------
 fig, (ax1, ax2) = plt.subplots(2, 1)
 _bins = np.linspace(0, max(allW_results_df['3RZ']), 15)
 __bins = np.linspace(0, max(allW_results_df['3RZ']), 50000)
@@ -361,7 +376,7 @@ kde4 = stats.gaussian_kde(W4_results_df['3RZ'], bw_method=1)
 
 
 ax1.legend()
-ax1.set_title("Histogramme du nombre de galaxies voisines dans un rayon de 3 $R_E$ pour les champs W1-4.")
+ax1.set_title("Histogramme du nombre de galaxies voisines dans un rayon de 3$R_E$ pour les champs W1-4.")
 
 
 __bins = np.linspace(0, max(allW_results_df['4RZ']), 50000)
@@ -379,58 +394,57 @@ kde4 = stats.gaussian_kde(W4_results_df['4RZ'])
 
 
 ax2.legend()
-ax2.set_title("Histogramme du nombre de galaxies voisines dans un rayon de 3 $R_E$ pour les champs W1-4.")
-ax2.set_xlabel(
-    "Nombre de galaxies voisines dans le champ")
+ax2.set_title("Histogramme du nombre de galaxies voisines dans un rayon de 4$R_E$ pour les champs W1-4.")
+ax2.set_xlabel("Nombre de galaxies voisines dans le champ")
 fig.suptitle(r"Les galaxies qui composent les lentilles sont retirées.")
 plt.show()
 
-
+# ----------------------------------------------------------
 fig, (ax1, ax2) = plt.subplots(2, 1)
-_bins = np.linspace(0, max(allW_results_df['3RZd']), 15)
-__bins = np.linspace(0, max(allW_results_df['3RZd']), 50000)
+_bins = np.linspace(0, max(allW_results_df['3RZd6']), 20)
+__bins = np.linspace(0, max(allW_results_df['3RZd6']), 50000)
 
-ax1.hist([W1_results_df['3RZd'], W2_results_df['3RZd'], W3_results_df['3RZd'], W4_results_df['3RZd']],
+ax1.hist([W1_results_df['3RZd6'], W2_results_df['3RZd6'], W3_results_df['3RZd6'], W4_results_df['3RZd6']],
          bins=_bins, label=['W1', 'W2', 'W3', 'W4'], density=True, alpha=1)
 
-kde1 = stats.gaussian_kde(W1_results_df['3RZd'], bw_method=1)
+kde1 = stats.gaussian_kde(W1_results_df['3RZd6'], bw_method=1)
 #ax1.plot(__bins, kde1(__bins), color='blue')
-kde2 = stats.gaussian_kde(W2_results_df['3RZd'], bw_method=1)
+kde2 = stats.gaussian_kde(W2_results_df['3RZd6'], bw_method=1)
 #ax1.plot(__bins, kde2(__bins), color='orange')
-kde3 = stats.gaussian_kde(W3_results_df['3RZd'], bw_method=1)
+kde3 = stats.gaussian_kde(W3_results_df['3RZd6'], bw_method=1)
 #ax1.plot(__bins, kde3(__bins), color='green')
-kde4 = stats.gaussian_kde(W4_results_df['3RZd'], bw_method=1)
+kde4 = stats.gaussian_kde(W4_results_df['3RZd6'], bw_method=1)
 #ax1.plot(__bins, kde4(__bins), color='red')
 
 
 ax1.legend()
 ax1.set_title(
-    "Histogramme du nombre de galaxies voisines dans un rayon de 3 $R_E$ pour les champs W1-4.")
+    "Histogramme du nombre de galaxies voisines dans un rayon de 3$R_E$ pour les champs W1-4.")
 
 
-__bins = np.linspace(0, max(allW_results_df['4RZd']), 50000)
-ax2.hist([W1_results_df['4RZd'], W2_results_df['4RZd'], W3_results_df['4RZd'], W4_results_df['4RZd']],
+__bins = np.linspace(0, max(allW_results_df['4RZd6']), 50000)
+ax2.hist([W1_results_df['4RZd6'], W2_results_df['4RZd6'], W3_results_df['4RZd6'], W4_results_df['4RZd6']],
          bins=_bins, label=['W1', 'W2', 'W3', 'W4'], density=True, alpha=1)
 
-kde1 = stats.gaussian_kde(W1_results_df['4RZd'])
+kde1 = stats.gaussian_kde(W1_results_df['4RZd6'])
 #ax2.plot(__bins, kde1(__bins), color='blue')
-kde2 = stats.gaussian_kde(W2_results_df['4RZd'])
+kde2 = stats.gaussian_kde(W2_results_df['4RZd6'])
 #ax2.plot(__bins, kde2(__bins), color='orange')
-kde3 = stats.gaussian_kde(W3_results_df['4RZd'])
+kde3 = stats.gaussian_kde(W3_results_df['4RZd6'])
 #ax2.plot(__bins, kde3(__bins), color='green')
-kde4 = stats.gaussian_kde(W4_results_df['4RZd'])
+kde4 = stats.gaussian_kde(W4_results_df['4RZd6'])
 #ax2.plot(__bins, kde4(__bins), color='red')
 
 
 ax2.legend()
 ax2.set_title(
-    "Histogramme du nombre de galaxies voisines dans un rayon de 3 $R_E$ pour les champs W1-4.")
+    "Histogramme du nombre de galaxies voisines dans un rayon de 4$R_E$ pour les champs W1-4.")
 ax2.set_xlabel(
-    "Nombre de galaxies voisines dans le champ / densité de galaxie dans le champs")
+    r"Nombre de galaxies voisines dans le champ $\div$ densité de galaxies dans le champ  ($\times 10^6$).")
 fig.suptitle(r"Les galaxies qui composent les lentilles sont retirées.")
 plt.show()
-
-
+# --------------------------
+"""
 from scipy import stats
 
 res = stats.probplot(x=allW_results_df["3Rd"], dist=stats.chi2, sparams=(5,), plot=plt)
@@ -444,3 +458,34 @@ plt.show()
 res = stats.probplot(x=allW_results_df["3Rd"], dist=stats.gamma, sparams=(1.5,50), plot=plt)
 plt.show()
 
+"""
+
+# Nombre de lentilles voisines
+
+
+file_lentilles = "./source/Lentilles.fits"
+with fits.open(file_lentilles, memmap=True) as hdulist_Lentilles:
+    hdulist_Lentilles.info()
+    lentilles_df = pd.DataFrame(hdulist_Lentilles[1].data)
+
+file_lentilles_2 = "./source/Lentilles.csv"
+lentilles_df_2 = pd.read_csv(
+    file_lentilles_2, sep=";", header=[0], skiprows=[1])
+
+
+lentilles_W4_df = lentilles_df_2[lentilles_df_2['Fld'] == "W4"]
+W4_lenses_list = list()
+for index, row in lentilles_W4_df.iterrows():
+    gal = Lense(RA=row["_RAJ2000"], DEC=row["_DEJ2000"],
+                Z=row["zph"], RE=row["Rad"]/3600, ID=row["ID"])
+    W4_lenses_list.append(gal)
+
+W4_dist = {}
+for i in range(len(W4_lenses_list)):
+    arr = np.zeros(len(W4_lenses_list))
+    cur_lense = W4_lenses_list[i]
+    for j in range (len(W4_lenses_list)):
+        arr[j] = cur_lense.distance(W4_lenses_list[j])
+    W4_dist[cur_lense.ID] = arr
+W4_dist
+W4_dist_df = pd.DataFrame.from_dict(W4_dist)
