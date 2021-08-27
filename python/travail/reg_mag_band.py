@@ -168,7 +168,7 @@ y_pred_linear = results.predict(X_test)
 y_pred_linear
 
 make_base_plot(data_df=X_test, Y=y_pred_linear,
-               _title="Plots des différences entre bandes photométriques pour les lentilles gravitationnelles en fonction du redshift, \ncolorée selon les prévisions via la régression linéaire sur l'chantillon de test")
+               _title="Plots des différences entre bandes photométriques pour les lentilles gravitationnelles en fonction du redshift, \ncolorée selon les prévisions via la régression linéaire sur l'échantillon de test")
 
 # ---- Gaussian Model
 from sklearn.mixture import GaussianMixture

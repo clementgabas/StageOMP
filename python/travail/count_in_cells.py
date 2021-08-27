@@ -10,7 +10,7 @@ import random as rd
 
 file_lentilles = "./source/Lentilles.fits"
 with fits.open(file_lentilles, memmap=True) as hdulist_Lentilles:
-    hdulist_Lentilles.info()
+    #hdulist_Lentilles.info()
     lentilles_df = pd.DataFrame(hdulist_Lentilles[1].data)
 
 file_lentilles_2 = "./source/Lentilles.csv"
@@ -26,6 +26,11 @@ lentilles_D3_df = lentilles_df_2[lentilles_df_2['Fld'] == "D3"]
 lentilles_WD3_df = pd.concat([lentilles_W3_df, lentilles_D3_df], )
 lentilles_W4_df = lentilles_df_2[lentilles_df_2['Fld'] == "W4"]
 
+W1_loc = [[30, -11.5], [30, -3.5], [39, -3.5], [39, -11.5]]
+D1_loc = [[35.9958, -4.9944], [35.9958, -3.9944], [36.9958, -3.9944], [36.9958, -4.9944]]
+W2_loc = [[131.5, -4.25], [131.5, 0.75], [136.5, 0.75], [136.5, -4.25]]
+W3_loc = [[209, 51], [219, 58], [219, 58], [209, 51]]
+D3_loc = [[214.25, 52.25], [214.25, 53.25], [215.25, 53.25], [215.25, 52.25]]
 
 def tirage_lenses(n_lenses, loc_coord):
     xs = [loc[0] for loc in loc_coord]
@@ -142,7 +147,7 @@ def make_division(std_d, real_d):
         out_d[key] = real_d[key]/std_d[key]
     return out_d
 
-def make_draw_values(value, dist_method):
+def make_draw_values(value, dist_method, fill_grid):
     if dist_method=='absolue':
         limit_valueP, limit_valueM = 1.1, -1.1
     elif dist_method == 'std':
@@ -152,11 +157,19 @@ def make_draw_values(value, dist_method):
         _color, _l, _face = 'red', 2, 'red'
     elif value <= limit_valueM:
         _color, _l, _face = 'green', 2, 'green'
+    if not fill_grid:
+        _face="None"
     return (_color, _l, _face)
     
 
-def plot_count_in_cell_dict(count_in_cell_dict, n_lenses, lense_coord='None', title='', D_field_coord=[], dist_method="absolue", _legend=True):
-    fig, ax = plt.subplots()
+def plot_count_in_cell_dict(count_in_cell_dict, n_lenses, lense_coord='None', fill_grid=True, write_num=True, title='', D_field_coord=[], dist_method="absolue", _legend=True, save=False, save_title="", show=True, base_fig=None, return_fig=False):
+    # fig, ax = plt.subplots()
+    if base_fig == None:
+        fig = plt.figure(figsize=(12, 12))
+    else:
+        fig = base_fig
+    ax = fig.gca()
+    #fig.set_dpi(400)
 
     rectangles = []
     count=0
@@ -169,7 +182,7 @@ def plot_count_in_cell_dict(count_in_cell_dict, n_lenses, lense_coord='None', ti
         x1, y1 = rectangle[2]
         width = x1-x0
         height = y1-y0
-        _color, _l, _face = make_draw_values(value, dist_method=dist_method)
+        _color, _l, _face = make_draw_values(value, dist_method=dist_method, fill_grid=fill_grid)
         curr_Rectangle = patches.Rectangle(xy=(x0, y0), width=width, height=height, linewidth=_l, edgecolor=_color, facecolor=_face, alpha=0.2)
         rectangles.append([value, curr_Rectangle])
         if count == 1:
@@ -192,7 +205,8 @@ def plot_count_in_cell_dict(count_in_cell_dict, n_lenses, lense_coord='None', ti
             rx, ry = r[1].get_xy()
             cx = rx + r[1].get_width()/2.0
             cy = ry + r[1].get_height()/2.0
-            ax.annotate(round(r[0], 3), (cx, cy), color='black', weight='bold', fontsize=6, ha='center', va='center')
+            if write_num:
+                ax.annotate(round(r[0], 3), (cx, cy), color='black', weight='bold', fontsize=10, ha='center', va='center')
     ax.set_xlim((x_min-.5, x_max+.5))
     ax.set_ylim((y_min-.5, y_max+.5))
     ax.invert_xaxis()
@@ -221,10 +235,24 @@ def plot_count_in_cell_dict(count_in_cell_dict, n_lenses, lense_coord='None', ti
             fig.legend(handles=[red_patch, green_patch, blue_patch, sca, black_patch, grey_patch])
         
     ax.set_aspect('equal')
-    plt.show()
+    
+    if save:
+        if save_title == "":
+            raise ValueError("save title must be a non null str")
+        filename = "./out_images/"
+        filename += save_title
+        filename += ".pdf"
+        plt.savefig(filename, dpi=500)
+        print("saving..")
+        
+    if return_fig:
+        return fig
+    
+    if show:
+        plt.show()
     
     
-def plot_simulations(n_simul=20_000, coord_champ=W1_loc, n_col=6, n_row=10, lentilles_df=lentilles_WD1_df, title='', coord_W=[], dist_method="absolue", _legend=True):
+def plot_simulations(n_simul=20_000, coord_champ=W1_loc, n_col=6, n_row=10, fill_grid = True, write_num=True, lentilles_df=lentilles_WD1_df, title='', coord_W=[], dist_method="absolue", _legend=True, save=False, save_title="", show=True, base_fig=None, return_fig=False):
     n_lenses = len(lentilles_df)
     print("making simulations...")
     mean_dict, std_dict = make_multiple_simulation(n_simul=n_simul, coord_champ=coord_champ, n_col=n_col, n_row=n_row, n_lenses=n_lenses)
@@ -237,58 +265,69 @@ def plot_simulations(n_simul=20_000, coord_champ=W1_loc, n_col=6, n_row=10, lent
     
     if dist_method.lower() == "absolue":
         o1 = make_substraction(mean_dict, d1)
-        plot_count_in_cell_dict(count_in_cell_dict=o1, n_lenses=n_lenses, dist_method="absolue",
-                                lense_coord=[c1_x, c1_y], title=title, D_field_coord=coord_W, _legend=_legend)
     elif dist_method.lower() == "std":
         o1 = make_division(mean_dict, d1)
-        plot_count_in_cell_dict(count_in_cell_dict=o1, n_lenses=n_lenses, dist_method="std",
-                                lense_coord=[c1_x, c1_y], title=title, D_field_coord=coord_W, _legend=_legend)
+
+    return plot_count_in_cell_dict(count_in_cell_dict=o1, n_lenses=n_lenses, dist_method=dist_method.lower(), fill_grid=fill_grid, write_num=write_num,
+                            lense_coord=[c1_x, c1_y], title=title, D_field_coord=coord_W, _legend=_legend,
+                            save=save, save_title=save_title, show=show, base_fig=base_fig, return_fig=return_fig)
 
 
 # Champs W1
 # on enregistr eles points dans cet ordre : [coin gauche bas, coin gauche haut, coin droite haut, coin droite bas]
-W1_loc = [[30, -11.5], [30, -3.5], [39, -3.5], [39, -11.5]]
-D1_loc = [[35.9958, -4.9944], [35.9958, -3.9944], [36.9958, -3.9944], [36.9958, -4.9944]]
-plot_simulations(n_simul=20_000, coord_champ=W1_loc, n_col=6, n_row=10, lentilles_df=lentilles_WD1_df, coord_W=D1_loc,
-                 title="Surdensité des lentilles dans les champs W1 & D1 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W1}$")
+if __name__ == "__main__":
+    
+    t = plot_simulations(n_simul=20_000, coord_champ=W1_loc, n_col=5, n_row=5, lentilles_df=lentilles_WD1_df, coord_W=D1_loc,
+                         title="Surdensité des lentilles dans les champs W1 & D1 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W1}$",
+                         return_fig=True)
+    
+    plot_simulations(n_simul=20_000, coord_champ=W1_loc, n_col=5, n_row=5, lentilles_df=lentilles_WD1_df, coord_W=D1_loc,
+                    title="Surdensité des lentilles dans les champs W1 & D1 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W1}$",
+                    save_title="surdensite_locale_WD1", save=True)
+
+    # Champs W2
+    # on enregistr eles points dans cet ordre : [coin gauche bas, coin gauche haut, coin droite haut, coin droite bas]
+    plot_simulations(n_simul=20_000, coord_champ=W2_loc, n_col=5, n_row=5, lentilles_df=lentilles_W2_df,
+                    title="Surdensité des lentilles dans le champ W2 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W2}$",
+                    save_title="surdensite_locale_W2", save=True)
+
+    # Champs W3
+    # on enregistr eles points dans cet ordre : [coin gauche bas, coin gauche haut, coin droite haut, coin droite bas]
 
 
-# Champs W2
-# on enregistr eles points dans cet ordre : [coin gauche bas, coin gauche haut, coin droite haut, coin droite bas]
-W2_loc = [[131.5, -4.25], [131.5, 0.75], [136.5, 0.75], [136.5, -4.25]]
-plot_simulations(n_simul=20_000, coord_champ=W2_loc, n_col=5, n_row=5, lentilles_df=lentilles_W2_df,
-                 title="Surdensité des lentilles dans le champ W2 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W2}$")
+    plot_simulations(n_simul=20_000, coord_champ=W3_loc, n_col=7, n_row=7, lentilles_df=lentilles_W3_df, coord_W=D3_loc,
+                    title="Surdensité des lentilles dans le champ W3 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W3}$",
+                    save_title="surdensite_locale_WD3", save=True)
 
-# Champs W3
-# on enregistr eles points dans cet ordre : [coin gauche bas, coin gauche haut, coin droite haut, coin droite bas]
-W3_loc = [[209, 51], [219, 58], [219, 58], [209, 51]]
-D3_loc = [[214.25, 52.25], [214.25, 53.25], [215.25, 53.25], [215.25, 52.25]]
+    """
+    # Moins de finesse
+    plot_simulations(n_simul=20_000, coord_champ=W1_loc, n_col=5, n_row=5, lentilles_df=lentilles_WD1_df, coord_W=D1_loc,
+                    title="Surdensité des lentilles dans les champs W1 & D1 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W1}$")
+    plot_simulations(n_simul=20_000, coord_champ=W2_loc, n_col=3, n_row=3, lentilles_df=lentilles_W2_df,
+                    title="Surdensité des lentilles dans le champ W2 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W2}$")
+    plot_simulations(n_simul=20_000, coord_champ=W3_loc, n_col=5, n_row=5, lentilles_df=lentilles_W3_df, coord_W=D3_loc,
+                    title="Surdensité des lentilles dans le champ W3 et D3 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W3}$")
+    """
 
-plot_simulations(n_simul=20_000, coord_champ=W3_loc, n_col=7, n_row=7, lentilles_df=lentilles_W3_df, coord_W=D3_loc,
-                 title="Surdensité des lentilles dans le champ W3 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W3}$")
-
-
-# Moins de finesse
-plot_simulations(n_simul=20_000, coord_champ=W1_loc, n_col=5, n_row=5, lentilles_df=lentilles_WD1_df, coord_W=D1_loc,
-                 title="Surdensité des lentilles dans les champs W1 & D1 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W1}$")
-plot_simulations(n_simul=20_000, coord_champ=W2_loc, n_col=3, n_row=3, lentilles_df=lentilles_W2_df,
-                 title="Surdensité des lentilles dans le champ W2 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W2}$")
-plot_simulations(n_simul=20_000, coord_champ=W3_loc, n_col=5, n_row=5, lentilles_df=lentilles_W3_df, coord_W=D3_loc,
-                 title="Surdensité des lentilles dans le champ W3 et D3 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W3}$")
-
-# Plus de finesse
-plot_simulations(n_simul=20_000, coord_champ=W1_loc, n_col=15, n_row=15, lentilles_df=lentilles_WD1_df, coord_W=D1_loc,
-                 title="Pics de surdensité des lentilles dans les champs W1 & D1 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W1}$")
-plot_simulations(n_simul=20_000, coord_champ=W2_loc, n_col=8, n_row=8, lentilles_df=lentilles_W2_df,
-                 title="Pics de surdensité des lentilles dans le champ W2 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W2}$")
-plot_simulations(n_simul=20_000, coord_champ=W3_loc, n_col=10, n_row=10, lentilles_df=lentilles_W3_df, coord_W=D3_loc,
-                 title="Pics de surdensité des lentilles dans le champ W3 et D3 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W3}$")
+    # Plus de finesse
+    plot_simulations(n_simul=20_000, coord_champ=W1_loc, n_col=15, n_row=15, lentilles_df=lentilles_WD1_df, coord_W=D1_loc,
+                    title="Pics de surdensité des lentilles dans les champs W1 & D1 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W1}$",
+                    save_title="pics_surdensite_locale_WD1", save=True)
+    plot_simulations(n_simul=20_000, coord_champ=W2_loc, n_col=8, n_row=8, lentilles_df=lentilles_W2_df,
+                    title="Pics de surdensité des lentilles dans le champ W2 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W2}$",
+                    save_title="pics_surdensite_locale_W2", save=True)
+    plot_simulations(n_simul=20_000, coord_champ=W3_loc, n_col=10, n_row=10, lentilles_df=lentilles_W3_df, coord_W=D3_loc,
+                    title="Pics de surdensité des lentilles dans le champ W3 et D3 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W3}$",
+                    save_title="pics_surdensite_locale_WD3", save=True)
 
 
-# std
-plot_simulations(n_simul=20_000, coord_champ=W1_loc, n_col=5, n_row=5, lentilles_df=lentilles_WD1_df, coord_W=D1_loc, dist_method="std",
-                 title="Surdensité des lentilles dans les champs W1 & D1 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W1}$",)
-plot_simulations(n_simul=20_000, coord_champ=W2_loc, n_col=3, n_row=3, lentilles_df=lentilles_W2_df, dist_method="std",
-                 title="Surdensité des lentilles dans les champ W2  \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W1}$",)
-plot_simulations(n_simul=20_000, coord_champ=W3_loc, n_col=5, n_row=5, lentilles_df=lentilles_W3_df, coord_W=D3_loc, dist_method="std",
-                 title="Surdensité des lentilles dans le champ W3 et D3 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W3}$")
+    # std
+    plot_simulations(n_simul=20_000, coord_champ=W1_loc, n_col=5, n_row=5, lentilles_df=lentilles_WD1_df, coord_W=D1_loc, dist_method="std",
+                    title="Surdensité des lentilles dans les champs W1 & D1 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W1}$",
+                    save_title="surdensite_locale_WD1_std", save=True)
+    plot_simulations(n_simul=20_000, coord_champ=W2_loc, n_col=3, n_row=3, lentilles_df=lentilles_W2_df, dist_method="std",
+                    title="Surdensité des lentilles dans les champ W2  \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W1}$",
+                    save_title="surdensite_locale_W2_std", save=True)
+    plot_simulations(n_simul=20_000, coord_champ=W3_loc, n_col=5, n_row=5, lentilles_df=lentilles_W3_df, coord_W=D3_loc, dist_method="std",
+                 title="Surdensité des lentilles dans le champ W3 et D3 \n20 000 simulations selon une loi uniforme $\mathcal{U}_{W3}$",
+                 save_title="surdensite_locale_WD3_std", save=True)

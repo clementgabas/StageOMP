@@ -6,6 +6,7 @@ from astropy.io import fits
 from astropy.table import Table
 import pandas as pd
 import math
+import random as rd
 
 
 file_lentilles = "./source/Lentilles.fits"
@@ -489,3 +490,70 @@ for i in range(len(W4_lenses_list)):
     W4_dist[cur_lense.ID] = arr
 W4_dist
 W4_dist_df = pd.DataFrame.from_dict(W4_dist)
+
+
+# Tirages aléatoires des lentilles
+n1, n2, n3, n4 = 60, 17, 31, 10
+
+#W1
+
+W1_loc = [[30, -11.5], [30, -3.5], [39, -3.5], [39, -11.5]]
+D1_loc = [[35.9958, -4.9944], [35.9958, -3.9944], [36.9958, -3.9944], [36.9958, -4.9944]]
+
+x_min, x_max = 30, 39
+y_min, y_max = -11.5, -3.5
+
+rd.seed(10)
+x1, y1 = [rd.uniform(x_min, x_max) for _ in range(n1)], [rd.uniform(y_min, y_max) for _ in range(n1)]
+
+file_W1_1 = "./source/pdz_W1_270912_part1.fits"
+file_W1_2 = "./source/pdz_W1_270912_part2.fits"
+
+dat_1 = Table.read(file_W1_1, format='fits')
+W1_1_df = dat_1.to_pandas()
+W1_1_df = W1_1_df[["ID", "RA", "DEC", "Z_MED_PDZ"]]
+
+dat_2 = Table.read(file_W1_2, format='fits')
+W1_2_df = dat_2.to_pandas()
+W1_2_df = W1_2_df[["ID", "RA", "DEC", "Z_MED_PDZ"]]
+
+W1_df = pd.concat([W1_1_df, W1_2_df], axis=0)
+
+# lentilles_W1_df = lentilles_df_2[lentilles_df_2['Fld'] == "W1"]
+
+
+W1_galaxies_list = list()
+for index, row in W1_df.iterrows():
+    gal = Galaxy(RA=row["RA"], DEC=row["DEC"],
+                 Z=row["Z_MED_PDZ"], ID=row["ID"])
+    W1_galaxies_list.append(gal)
+
+W1_lenses_list = list()
+for i in range(n1):
+    gal = Lense(RA=x1[i], DEC=y1[i])
+    W1_lenses_list.append(gal)
+
+W1_results_dict = {}
+for lense in W1_lenses_list:
+    W1_results_dict[lense.ID] = {
+        "3R": 0,
+        "4R": 0,
+        "3RZ": 0,
+        "4RZ": 0
+    }
+    W1_results_dict[lense.ID]["3R"] = lense.compute_number_neighbor_in_R(
+        R=3*lense.re, list_of_galaxies=W1_galaxies_list)
+    W1_results_dict[lense.ID]["4R"] = lense.compute_number_neighbor_in_R(
+        R=4*lense.re, list_of_galaxies=W1_galaxies_list)
+    W1_results_dict[lense.ID]["3RZ"] = lense.compute_number_neighbor_in_R_forZ(
+        R=3*lense.re, list_of_galaxies=W1_galaxies_list)
+    W1_results_dict[lense.ID]["4RZ"] = lense.compute_number_neighbor_in_R_forZ(
+        R=4*lense.re, list_of_galaxies=W1_galaxies_list)
+    W1_results_dict[lense.ID]["RA"] = lense.ra
+    W1_results_dict[lense.ID]["DEC"] = lense.dec
+W1_results_df = pd.DataFrame.from_dict(W1_results_dict, orient='index')
+W1_results_df['Field'] = "W1"
+
+W2_loc = [[131.5, -4.25], [131.5, 0.75], [136.5, 0.75], [136.5, -4.25]]
+W3_loc = [[209, 51], [219, 58], [219, 58], [209, 51]]
+D3_loc = [[214.25, 52.25], [214.25, 53.25], [215.25, 53.25], [215.25, 52.25]]
